@@ -128,14 +128,15 @@ sub open_sales_page {
     my $form = $mech->form_id('defaultVendorPage')
         or die 'Cannot find navigation form';
 
-    $mech->$assert_html(qr/j_id_jsp_111414985_2['"]/);
+    my ($ajaxrequest) = $mech->content =~ /id="defaultVendorPage:(j_id_jsp_\d+_2)"/;
+    $mech->$assert_html(qr/$ajaxrequest['"]/);
 
     my @f = $form->form;
 
     $mech->post($mech->uri, [
         @f,
-        AJAXREQUEST                              => 'j_id_jsp_111414985_2',
-        'defaultVendorPage:j_id_jsp_111414985_2' => 'defaultVendorPage:j_id_jsp_111414985_2',
+        AJAXREQUEST                      => $ajaxrequest,
+        "defaultVendorPage:$ajaxrequest" => "defaultVendorPage:$ajaxrequest",
     ]);
     $mech->success or die 'failed to ajax';
 
